@@ -1,31 +1,62 @@
 <!DOCTYPE html>
-	<html lang="pt-br">
-		<head>
-			<meta charset="utf-8"/>
-			<title>Formulário de cadastro de Notícia</title>
-		</head>
-	<body>
+<html lang="pt-br">
 
-		<h1>Adicionar notícia</h1>
-		<br />
+<head>
+	<meta charset="utf-8" />
+	<title>Formulário de cadastro de Notícia</title>
+</head>
 
-		<form action="/noticias/salvar" method="post">
-			<div>	
-				<label for="titulo">Título</label>
-				<input type="text" id='titulo' name='titulo' placeholder="Título da notícia"/>
-			</div>
+<body>
 
-			<div>
-				<label for="noticia">Notícia</label>
-				<textarea name="noticia" id="noticia" cols="30" rows="10"></textarea>
-			</div>
+	<h1>Adicionar notícia</h1>
+	<br />
 
-			<div>
-				<input type="submit" value="enviar" />
-			</div>
+	<% if(validacao) {%>
 
-		</form>
+		<ul>
+
+			<% for(let i=0; i< validacao.length;i++){ %>
+
+				<li>
+					<%=validacao[i].msg  %> 
+				</li>
+
+				<%}  %> 
+
+		</ul>
+
+		<% } %>
+
+			<form action="/noticias/salvar" method="post">
+				<div>
+					<label for="titulo">Título</label>
+					<input type="text" id='titulo' name='titulo' value="<%=noticia.titulo%>" placeholder="Título da notícia" />
+				</div>
+				<div>
+					<label for="resumo">Resumo</label>
+					<input type="text" id='resumo' name='resumo' value="<%=noticia.resumo%>" placeholder="Resumo da notícia" />
+				</div>
+				<div>
+					<label for="autor_noticia">Autor</label>
+					<input type="text" id='autor_noticia' name='autor_noticia' value="<%=noticia.autor_noticia%>" placeholder="Resumo da notícia" />
+				</div>
+				<div>
+					<label for="data_noticia">Data</label>
+					<input type="date" id='data_noticia' name='data_noticia' value="<%=noticia.data_noticia%>" placeholder="Resumo da notícia" />
+				</div>
+
+				<div>
+					<label for="noticia">Notícia</label>
+					<textarea name="noticia" id="noticia" cols="30" rows="10"></textarea>
+				</div>
+
+				<div>
+					<input type="submit" value="enviar" />
+				</div>
+
+			</form>
 
 
-	</body>
+</body>
+
 </html>
