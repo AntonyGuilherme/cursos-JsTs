@@ -7,6 +7,7 @@ app.set('view online','ejs'); //* informando que o ejs será o processador de ht
 app.set('views','./app/views');
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(ExpressValidator());
+app.use(express.static('./app/public'))
 
 consign()
     .include('app/routes')
