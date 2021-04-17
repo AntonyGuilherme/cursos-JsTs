@@ -13,7 +13,7 @@ module.exports.iniciaChat = (app, request, response) => {
     }
 
     app.get('io').emit('msgParaCliente',{apelido : dadosForm.apelido , mensagem : ' acabou de entrar no chat'});
-    response.render('chat.ejs');
+    response.render('chat.ejs',{dadosForm});
 
 
 }
