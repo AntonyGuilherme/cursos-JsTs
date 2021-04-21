@@ -1,0 +1,26 @@
+<div id="pergaminhos">
+	<h3>Pergaminhos</h3>
+
+	<ul>
+		<% for(const acao of acoes) {%>
+
+
+			<% 
+			let text_acao='' ; 
+			let time = acao.acao_termina_em -  new Date().getTime();
+			switch (parseInt(acao.acao)) { 
+				case 1: text_acao=`aldeão(ões) coletando recursos`; break; 
+				case 2: text_acao=`enforcamento(s) programado`; break; 
+				case 3: text_acao=`aldeão(ões) em treinamento de história`; break; 
+				case 4: text_acao=`aldeão(ões) em treinamento de magia`; break; 
+				default: break; } %>
+
+				<li>
+					<%= acao.quantidade %> - <%= text_acao %> - <small>restam <span class="tempo_restante" > <%= Math.floor(time / 1000) %></span>  segundos - 
+						<a href="/revogar_acao?id_acao=<%=acao._id%>">revogar ordem</a></small></small>
+				</li>
+				<% } %>
+
+
+	</ul>
+</div>

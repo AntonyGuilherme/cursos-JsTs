@@ -1,0 +1,14 @@
+{
+  "name": "curso-nodejs-express-session",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "AntonyGuilherme",
+  "license": "MIT",
+  "dependencies": {
+    "express-session": "^1.17.1"
+  }
+}
