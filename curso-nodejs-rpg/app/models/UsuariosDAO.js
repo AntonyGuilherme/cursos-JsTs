@@ -1,4 +1,4 @@
-const { response } = require("express");
+const  crypto  = require("crypto");
 
 
 
@@ -17,7 +17,8 @@ class UsuariosDAO {
     async inserirUsuario(usuario){
     
         this.#_connection()
-        .then(async mongo => {
+        .then(async mongo => { 
+             usuario.senha = crypto.createHash('md5').update(usuario.senha).digest("hex");
             await mongo.db('got').collection('usuarios').insertOne(usuario);
             mongo.close();
         })
@@ -29,7 +30,8 @@ class UsuariosDAO {
     async autenticar({usuario,senha},request,response){
         this.#_connection()
         .then(async mongo => {
-            const user = await mongo.db('got').collection('usuarios').find({usuario,senha}).toArray();
+            const senha_crypt = crypto.createHash('md5').update(usuario.senha).digest("hex");
+            const user = await mongo.db('got').collection('usuarios').find({usuario,senha : senha_crypt}).toArray();
             mongo.close();
             
             if(!!user.length){
