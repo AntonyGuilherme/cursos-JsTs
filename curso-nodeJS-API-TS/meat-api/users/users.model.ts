@@ -9,6 +9,10 @@ export interface User extends mongoose.Document {
     password : string
 }
 
+export interface UserModel extends mongoose.Model<User> {
+    findByEmail(email : string) : Promise<User>   
+}
+
 
 const userSchema = new mongoose.Schema<User>({
 
@@ -22,10 +26,16 @@ const userSchema = new mongoose.Schema<User>({
     } }
 });
 
+
+userSchema.statics.findByEmail = function(email : string){
+    return this.findOne({email});
+}
+
+
 const hashPassword = (obj,next) => {
     bcrypt.hash(obj.password,environment.security.saltRounds).then(hash => {
         obj.password = hash;
-        next();
+        return next();
     }).catch(next);
 }
 
@@ -36,7 +46,7 @@ const saveMiddleware = function(next){
         if(!user.isModified('password')){
             next(null);
         }else{
-            hashPassword(user,next(null))
+            hashPassword(user,next)
         }
     
     
@@ -54,4 +64,4 @@ userSchema.pre('save', saveMiddleware);
 userSchema.pre('updateOne',updateMiddleware);
 userSchema.pre('replaceOne',updateMiddleware);
 
-export const User = mongoose.model<User>('User',userSchema);
+export const User = mongoose.model<User,UserModel>('User',userSchema);

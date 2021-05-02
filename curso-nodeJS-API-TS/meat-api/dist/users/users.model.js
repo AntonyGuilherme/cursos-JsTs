@@ -15,10 +15,13 @@ const userSchema = new mongoose.Schema({
             message: '{PATH}: Invalid CPF ({VALUE})'
         } }
 });
+userSchema.statics.findByEmail = function (email) {
+    return this.findOne({ email });
+};
 const hashPassword = (obj, next) => {
     bcrypt.hash(obj.password, environment_1.environment.security.saltRounds).then(hash => {
         obj.password = hash;
-        next();
+        return next();
     }).catch(next);
 };
 const saveMiddleware = function (next) {
@@ -28,7 +31,7 @@ const saveMiddleware = function (next) {
         next(null);
     }
     else {
-        hashPassword(user, next(null));
+        hashPassword(user, next);
     }
 };
 const updateMiddleware = function (next) {

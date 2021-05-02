@@ -7,14 +7,15 @@ export const handleError = (request: restify.Request, response: restify.Response
     let messages: any[] = [];
 
     switch (error.name) {
+
         case 'MongoError':
             if (error.code === 11000) {
-                response.statusCode = 400
+                error.statusCode = 400
                 messages.push({ message: error.message })
             }
             break;
         case 'ValidationError':
-            response.statusCode = 400;
+            error.statusCode = 400;
             for (const name in error.errors) {
                 messages.push({ message: error.errors[name].message })
             }
