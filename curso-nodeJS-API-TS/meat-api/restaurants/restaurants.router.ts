@@ -1,6 +1,7 @@
 import { Server } from 'restify';
 import { NotFoundError } from 'restify-errors';
 import { ModelRouter, restifyCallBack } from '../common/model-router';
+import { authorize } from '../security/authz.handler';
 import { Restaurant } from './restaurants.model';
 
 class RestaurantsRouter extends ModelRouter<Restaurant>{
@@ -50,15 +51,15 @@ class RestaurantsRouter extends ModelRouter<Restaurant>{
 
     applyRouter(application: Server) {
        
-        application.get('/restaurants', this.findAll);
+        application.get('/restaurants',  this.findAll);
         application.get('/restaurants/:_id', this.validateId , this.findById);
-        application.post('/restaurants', this.save);
-        application.put('/restaurants/:_id', this.validateId , this.replaceOne);
-        application.patch('/restaurants/:_id',this.validateId , this.update);
-        application.del('/restaurants/:_id', this.validateId , this.delete);
+        application.post('/restaurants',  authorize('admin') ,this.save);
+        application.put('/restaurants/:_id',  authorize('admin') , this.validateId , this.replaceOne);
+        application.patch('/restaurants/:_id',  authorize('admin') ,this.validateId , this.update);
+        application.del('/restaurants/:_id',  authorize('admin') ,this.validateId , this.delete);
 
         application.get('/restaurants/:_id/menu',this.validateId , this.findMenu);
-        application.put('/restaurants/:_id/menu',this.validateId , this.replaceMenu)
+        application.put('/restaurants/:_id/menu',  authorize('admin') ,this.validateId , this.replaceMenu)
         return super.applyRouter(application);
     }
 

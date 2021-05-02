@@ -15,6 +15,8 @@ const restify = require("restify");
 const environment_1 = require("../common/environment");
 const merge_patch_parser_1 = require("./merge-patch.parser");
 const error_handler_1 = require("./error.handler");
+const token_parse_1 = require("../security/token.parse");
+const fs = require("fs");
 class Server {
     initializeDb() {
         return mongoose.connect(environment_1.environment.db.url, { useFindAndModify: true, useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
@@ -23,14 +25,20 @@ class Server {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 try {
-                    this.application = restify.createServer({
+                    const options = {
                         name: 'meat-api',
                         version: '1.0.0'
-                    });
+                    };
+                    if (environment_1.environment.security.enableHTTPS) {
+                        options.certificate = fs.readFileSync(environment_1.environment.security.certificate);
+                        options.key = fs.readFileSync(environment_1.environment.security.key);
+                    }
+                    this.application = restify.createServer(options);
                     // antes das rotas
                     this.application.use(restify.plugins.queryParser());
                     this.application.use(restify.plugins.bodyParser());
                     this.application.use(merge_patch_parser_1.mergePatchBodyParser);
+                    this.application.use(token_parse_1.tokenParser);
                     //avaliable routes
                     let _links = [];
                     //routes

@@ -1,6 +1,7 @@
-import  * as mongoose from 'mongoose';
+import * as mongoose from 'mongoose';
 import * as restify from 'restify';
 import { ModelRouter } from '../common/model-router';
+import { authorize } from '../security/authz.handler';
 import { Review } from './reviews.model';
 
 class ReviewsRouter extends ModelRouter<Review>{
@@ -21,9 +22,9 @@ class ReviewsRouter extends ModelRouter<Review>{
     return query.populate('user', ['name', 'email']).populate('restaurant');
   }
 
-  envelope(document : any){
+  envelope(document: any) {
     const resource = super.envelope(document);
-    const restId = resource.restaurant._id ?? resource.restaurant ;
+    const restId = resource.restaurant._id ?? resource.restaurant;
     resource._links.restaurant = `/restaurants/${restId}`;
     return resource;
   }
@@ -33,8 +34,8 @@ class ReviewsRouter extends ModelRouter<Review>{
 
     application.get('/reviews', this.findAll);
     application.get('/reviews/:_id', this.validateId, this.findById);
-    application.post('/reviews', this.save);
-    return super.applyRouter(application) ;
+    application.post('/reviews', authorize('user'), this.save);
+    return super.applyRouter(application);
   }
 
 }

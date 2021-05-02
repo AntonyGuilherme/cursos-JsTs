@@ -16,6 +16,19 @@ const beforeAllTests = async () => {
     server = new Server();
     return server.bootstrap([usersRouter , reviewsRouter , restaurantsRouter ])
         .then(() => User.deleteMany({}).exec())
+        .then( () => {
+            let admin = new User();
+            admin.name = "admin";
+            admin.email = "admin@email.com";
+            admin.password = '123456';
+            admin.profiles = ['user','admin'];
+            let adminNoPermission = new User();
+            adminNoPermission.name = "admin";
+            adminNoPermission.email = "adminPermission@email.com";
+            adminNoPermission.password = '123456';
+            adminNoPermission.profiles = [];
+            return Promise.all([admin.save() , adminNoPermission.save()]);
+        } )
         .then(() => Review.deleteMany({}).exec())
         .catch(console.error)
 }

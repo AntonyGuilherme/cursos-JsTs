@@ -1,14 +1,16 @@
 import 'jest';
-import { ObjectId} from 'mongoose';
+import { ObjectId } from 'mongoose';
 import * as request from 'supertest';
 import { globals } from '../jest.config';
 
 const URL_TEST: string = globals.address;
+const auth: string = globals.auth;
 
 test('get all restaurants', async () => {
 
     return request(URL_TEST)
         .get('/restaurants')
+        .set('Authorization', auth)
         .then(response => {
             expect(response.status).toBe(200);
             expect(response.body.items).toBeInstanceOf(Array);
@@ -19,14 +21,14 @@ test('get all restaurants', async () => {
 
 test('get restaurant by id', async () => {
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-GETBYID", menu: [] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-GETBYID", menu: [] })
         .then((restaurant) => {
 
             //verifing restaurant
             expect(restaurant.body._id).toBeDefined();
             expect(restaurant.body.name).toBe("Restaurante-GETBYID");
 
-            return request(URL_TEST).get(`/restaurants/${restaurant.body._id}`).send({});
+            return request(URL_TEST).get(`/restaurants/${restaurant.body._id}`).set('Authorization', auth).send({});
         })
         .then(response => {
             expect(response.status).toBe(200);
@@ -39,7 +41,7 @@ test('get restaurant by id', async () => {
 
 test('post restaurant by id', async () => {
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-Post", menu: [] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-Post", menu: [] })
         .then((restaurant) => {
 
             //verifing restaurant
@@ -54,7 +56,7 @@ test('post restaurant by id', async () => {
 test('put replace by id', async () => {
 
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-replace", menu: [{ name: "juice", price: 100 }] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-replace", menu: [{ name: "juice", price: 100 }] })
         .then((restaurant) => {
 
             //verifing restaurant
@@ -63,7 +65,7 @@ test('put replace by id', async () => {
             expect(restaurant.body.menu[0].price).toBe(100);
 
 
-            return request(URL_TEST).put(`/restaurants/${restaurant.body._id}`).send({
+            return request(URL_TEST).put(`/restaurants/${restaurant.body._id}`).set('Authorization', auth).send({
                 name: "Restaurant-replaced"
             });
         })
@@ -82,14 +84,14 @@ test('put replace by id', async () => {
 test('patch update restaurant', async () => {
 
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-update", menu: [] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-update", menu: [] })
         .then((restaurant) => {
 
             //verifing restaurant
             expect(restaurant.body._id).toBeDefined();
             expect(restaurant.body.name).toBe("Restaurante-update");
 
-            return request(URL_TEST).patch(`/restaurants/${restaurant.body._id}`).send({
+            return request(URL_TEST).patch(`/restaurants/${restaurant.body._id}`).set('Authorization', auth).send({
                 name: "Restaurant-updated", menu: [{ name: "juice", price: 100 }]
             });
         })
@@ -107,14 +109,14 @@ test('patch update restaurant', async () => {
 test('delete restaurant', async () => {
 
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-delete", menu: [] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-delete", menu: [] })
         .then((restaurant) => {
 
             //verifing restaurant
             expect(restaurant.body._id).toBeDefined();
             expect(restaurant.body.name).toBe("Restaurante-delete");
 
-            return request(URL_TEST).delete(`/restaurants/${restaurant.body._id}`).send({});
+            return request(URL_TEST).delete(`/restaurants/${restaurant.body._id}`).set('Authorization', auth).send({});
         })
         .then(response => {
 
@@ -129,7 +131,7 @@ test('delete restaurant', async () => {
 
 test('get menu', async () => {
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-getMenu", menu: [{ name: "juice", price: 100 }] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-getMenu", menu: [{ name: "juice", price: 100 }] })
         .then((restaurant) => {
 
             //verifing restaurant
@@ -139,7 +141,7 @@ test('get menu', async () => {
             expect(restaurant.body.menu[0].name).toBe('juice');
             expect(restaurant.body.menu[0].price).toBe(100);
 
-            return request(URL_TEST).get(`/restaurants/${restaurant.body._id}/menu`).send({});
+            return request(URL_TEST).get(`/restaurants/${restaurant.body._id}/menu`).set('Authorization', auth).send({});
         })
         .then(response => {
 
@@ -155,7 +157,7 @@ test('get menu', async () => {
 
 test('put menu', async () => {
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-putMenu", menu: [] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-putMenu", menu: [] })
         .then((restaurant) => {
 
             //verifing restaurant
@@ -163,7 +165,7 @@ test('put menu', async () => {
             expect(restaurant.body.name).toBe("Restaurante-putMenu");
             expect(restaurant.body.menu).toBeInstanceOf(Object);
 
-            return request(URL_TEST).put(`/restaurants/${restaurant.body._id}/menu`).send([{ name: "juice", price: 100 }]);
+            return request(URL_TEST).put(`/restaurants/${restaurant.body._id}/menu`).set('Authorization', auth).send([{ name: "juice", price: 100 }]);
         })
         .then(response => {
 
@@ -179,27 +181,27 @@ test('put menu', async () => {
 
 test("restaurant - document not founded", async () => {
 
-    return request(URL_TEST).get(`/restaurants/42`)
-    .then(response => {
+    return request(URL_TEST).get(`/restaurants/42`).set('Authorization', auth)
+        .then(response => {
 
-        expect(response.status).toBe(404);
-        expect(response.body.messages).toBeInstanceOf(Array);
+            expect(response.status).toBe(404);
+            expect(response.body.messages).toBeInstanceOf(Array);
 
-    })
-    .catch(fail);
+        })
+        .catch(fail);
 
 })
 
 test("restaurant/menu - document not founded", async () => {
 
-    return request(URL_TEST).get(`/restaurants/42/menu`)
-    .then(response => {
+    return request(URL_TEST).get(`/restaurants/42/menu`).set('Authorization', auth)
+        .then(response => {
 
-        expect(response.status).toBe(404);
-        expect(response.body.messages).toBeInstanceOf(Array);
+            expect(response.status).toBe(404);
+            expect(response.body.messages).toBeInstanceOf(Array);
 
-    })
-    .catch(fail);
+        })
+        .catch(fail);
 
 });
 
@@ -207,8 +209,8 @@ test('delete restaurant not founded', async () => {
 
 
 
-    return request(URL_TEST).delete(`/restaurants/42`).send({})
-        
+    return request(URL_TEST).delete(`/restaurants/42`).set('Authorization', auth).send({})
+
         .then(response => {
 
             expect(response.status).toBe(404);
@@ -224,7 +226,7 @@ test('delete restaurant not founded', async () => {
 
 test('put menu - without price and name', async () => {
 
-    return request(URL_TEST).post('/restaurants').send({ name: "Restaurante-putMenu", menu: [] })
+    return request(URL_TEST).post('/restaurants').set('Authorization', auth).send({ name: "Restaurante-putMenu", menu: [] })
         .then((restaurant) => {
 
             //verifing restaurant
@@ -232,7 +234,7 @@ test('put menu - without price and name', async () => {
             expect(restaurant.body.name).toBe("Restaurante-putMenu");
             expect(restaurant.body.menu).toBeInstanceOf(Object);
 
-            return request(URL_TEST).put(`/restaurants/${restaurant.body._id}/menu`).send([{}]);
+            return request(URL_TEST).put(`/restaurants/${restaurant.body._id}/menu`).set('Authorization', auth).send([{}]);
         })
         .then(response => {
 
@@ -240,6 +242,6 @@ test('put menu - without price and name', async () => {
             expect(response.body.messages).toBeInstanceOf(Array);
 
         })
-        .catch(fail)
+        .catch(fail);
 
 });
