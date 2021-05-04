@@ -6,6 +6,8 @@ import { mergePatchBodyParser } from './merge-patch.parser';
 import { handleError } from './error.handler';
 import { tokenParser } from '../security/token.parse'
 import * as fs from 'fs';
+import { logger } from '../common/logger';
+import * as corsMiddleware from 'restify-cors-middleware';
 
 
 export class Server {
@@ -21,18 +23,38 @@ export class Server {
             try {
 
                 const options: restify.ServerOptions = {
-                    name:'meat-api',
-                    version:'1.0.0'
+                    name: 'meat-api',
+                    version: '1.0.0',
+                    log: logger
                 }
 
-                if(environment.security.enableHTTPS){
-                   options.certificate = fs.readFileSync(environment.security.certificate); 
-                   options.key = fs.readFileSync(environment.security.key); 
+                if (environment.security.enableHTTPS) {
+                    options.certificate = fs.readFileSync(environment.security.certificate);
+                    options.key = fs.readFileSync(environment.security.key);
                 }
 
                 this.application = restify.createServer(options);
 
+                const corsOptions: corsMiddleware.Options = {
+                    preflightMaxAge: 10,
+                    origins: ['http://localhost:80'], // * todas as origens são permitidas com esse símbolo
+                    allowHeaders: ['authorization'],
+                    exposeHeaders: ['x-custom-header'] //expor um header para aplicação cliente normalmente personalizado
+                };
+
+                const cors: corsMiddleware.CorsMiddleware = corsMiddleware(corsOptions);
+
+                /*
+                 o method pre sempre é chamado quando há uma nova requisição 
+                o method use é chamado somente se a rota for válida 
+                */
+
+                //request logger
+                this.application.pre(restify.plugins.requestLogger({ log: logger }));
+                this.application.pre(cors.preflight)
+
                 // antes das rotas
+                this.application.use(cors.actual)
                 this.application.use(restify.plugins.queryParser());
                 this.application.use(restify.plugins.bodyParser());
                 this.application.use(mergePatchBodyParser);
@@ -50,9 +72,19 @@ export class Server {
                     response.json({ _links });
                     return next();
                 })
+                this.application.put('/', function (request, response, next) {
+                    response.json({ _links });
+                    return next();
+                })
 
                 this.application.listen(environment.server.port, () => resolve(this.application));
-                this.application.on('restifyError', handleError)
+                this.application.on('restifyError', handleError);
+                //(request,response,route,error)
+                /* this.application.on('after',restify.plugins.auditLogger({log : logger , event: 'after' , server: this.application}))
+ 
+                 this.application.on('audit', data => {
+                     // dados dos logs
+                 })*/
 
             }
             catch (error) {
